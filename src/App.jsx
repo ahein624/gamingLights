@@ -20,6 +20,7 @@ const scenes = [
 
 const quickColors = ['#8b5cf6', '#2563eb', '#06b6d4', '#22c55e', '#f59e0b', '#ef4444', '#f8fafc']
 const defaultPrefs = { backgroundColor: '#050509', backgroundImage: '', alertEnabled: false, noiseThreshold: 65 }
+const WLED_SYNC_INTERVAL_MS = 1000
 
 function EtherealWave() {
   return (
@@ -74,8 +75,42 @@ export default function App() {
   useEffect(() => { stateRef.current = state }, [state])
   useEffect(() => { localStorage.setItem('gamingLightsPrefs', JSON.stringify(prefs)) }, [prefs])
   useEffect(() => () => stopListening(), [])
+
   useEffect(() => {
-    getLightState().then(setState).catch(() => setError('Controller unavailable')).finally(() => setLoading(false))
+    let cancelled = false
+
+    const syncFromWled = async () => {
+      try {
+        const next = await getLightState()
+        if (cancelled) return
+
+        // WLED is authoritative for hardware state. Keep the friendly scene label
+        // unless the user explicitly selects another scene in this UI.
+        setState((current) => ({
+          ...current,
+          on: next.on,
+          brightness: next.brightness,
+          color: next.color,
+          live: next.live,
+          connected: next.connected,
+        }))
+        setError('')
+      } catch {
+        if (cancelled) return
+        setState((current) => ({ ...current, connected: false }))
+        setError('Controller unavailable')
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    }
+
+    syncFromWled()
+    const interval = window.setInterval(syncFromWled, WLED_SYNC_INTERVAL_MS)
+
+    return () => {
+      cancelled = true
+      window.clearInterval(interval)
+    }
   }, [])
 
   const update = async (patch) => {
@@ -212,7 +247,7 @@ export default function App() {
           <UpdateManager />
         </section>}
 
-        <footer><span>{state.connected ? <Wifi size={15} /> : <WifiOff size={15} />}{state.connected ? 'Controller online' : 'Development mode'}</span><button className="footer-settings" onClick={() => setSettingsOpen((open) => !open)}><Settings size={14} />Settings</button><span>Gaming Lights · v0.6</span></footer>
+        <footer><span>{state.connected ? <Wifi size={15} /> : <WifiOff size={15} />}{state.connected ? 'Controller online' : 'Development mode'}</span><button className="footer-settings" onClick={() => setSettingsOpen((open) => !open)}><Settings size={14} />Settings</button><span>Gaming Lights · v0.7</span></footer>
       </div>
     </main>
   )
