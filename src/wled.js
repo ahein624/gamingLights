@@ -6,7 +6,7 @@ const mockState = {
   color: '#8b5cf6',
   scene: 'gaming',
   live: false,
-  connected: true,
+  connected: false,
 }
 
 const apiBase = import.meta.env.VITE_WLED_API_BASE?.replace(/\/$/, '')
