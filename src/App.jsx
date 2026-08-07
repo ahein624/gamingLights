@@ -97,6 +97,10 @@ export default function App() {
     update({ scene: scene.id, color: scene.colors[0], on: true })
   }
 
+  const chooseColor = (color) => {
+    update({ color, scene: 'solid', on: true })
+  }
+
   return (
     <main className="app-shell">
       <EtherealWave />
@@ -160,9 +164,26 @@ export default function App() {
         <section className="control-card">
           <div className="control-label"><span>Brightness</span><strong>{state.brightness}%</strong></div>
           <input className="brightness" type="range" min="1" max="100" value={state.brightness} onChange={(event) => setState((current) => ({ ...current, brightness: Number(event.target.value) }))} onPointerUp={(event) => update({ brightness: Number(event.currentTarget.value), on: true })} onKeyUp={(event) => update({ brightness: Number(event.currentTarget.value), on: true })} />
-          <div className="quick-label">Quick color</div>
+
+          <div className="color-control-heading">
+            <div>
+              <div className="quick-label">Color</div>
+              <span className="current-color-value">{state.color.toUpperCase()}</span>
+            </div>
+            <label className="color-picker-control" aria-label="Choose custom color">
+              <span className="color-picker-preview" style={{ background: state.color }} />
+              <span>Custom</span>
+              <input
+                type="color"
+                value={state.color}
+                onChange={(event) => chooseColor(event.target.value)}
+                aria-label="Custom light color"
+              />
+            </label>
+          </div>
+
           <div className="color-row">
-            {quickColors.map((color) => <button key={color} aria-label={`Set color ${color}`} className={`color-swatch ${state.color === color ? 'chosen' : ''}`} style={{ background: color }} onClick={() => update({ color, scene: 'solid', on: true })} />)}
+            {quickColors.map((color) => <button key={color} aria-label={`Set color ${color}`} className={`color-swatch ${state.color === color ? 'chosen' : ''}`} style={{ background: color }} onClick={() => chooseColor(color)} />)}
           </div>
         </section>
 
@@ -174,7 +195,7 @@ export default function App() {
 
         <footer>
           <span>{state.connected ? <Wifi size={15} /> : <WifiOff size={15} />}{state.connected ? 'Controller online' : 'Development mode'}</span>
-          <span>Gaming Lights · v0.2</span>
+          <span>Gaming Lights · v0.3</span>
         </footer>
       </div>
     </main>
