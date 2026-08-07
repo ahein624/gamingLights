@@ -1,15 +1,17 @@
 {
   "name": "gaming-lights",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.5.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start": "node server/index.js"
   },
   "dependencies": {
     "@vitejs/plugin-react": "latest",
+    "express": "^5.1.0",
     "vite": "latest",
     "react": "latest",
     "react-dom": "latest",
