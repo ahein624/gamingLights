@@ -25,6 +25,51 @@ const scenes = [
 
 const quickColors = ['#8b5cf6', '#2563eb', '#06b6d4', '#22c55e', '#f59e0b', '#ef4444', '#f8fafc']
 
+function EtherealWave() {
+  return (
+    <div className="wave-stage" aria-hidden="true">
+      <svg className="wave-field" viewBox="0 0 1600 420" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="waveGradientA" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor="#9d3cff" />
+            <stop offset="24%" stopColor="#4f63ff" />
+            <stop offset="48%" stopColor="#31b7ff" />
+            <stop offset="70%" stopColor="#d8b56c" />
+            <stop offset="100%" stopColor="#d94c7f" />
+          </linearGradient>
+          <linearGradient id="waveGradientB" x1="1" y1="0" x2="0" y2="0">
+            <stop offset="0%" stopColor="#b43cff" />
+            <stop offset="32%" stopColor="#405cff" />
+            <stop offset="62%" stopColor="#45d6cf" />
+            <stop offset="100%" stopColor="#d97186" />
+          </linearGradient>
+          <filter id="waveGlow" x="-20%" y="-80%" width="140%" height="260%">
+            <feGaussianBlur stdDeviation="13" />
+          </filter>
+        </defs>
+
+        <g className="wave-glow" filter="url(#waveGlow)">
+          <path d="M-120 250 C80 120 210 350 390 245 S680 125 835 250 S1100 360 1270 235 S1510 150 1720 250" />
+          <path d="M-120 260 C120 360 220 140 430 260 S700 340 880 225 S1150 150 1320 265 S1530 350 1720 230" />
+        </g>
+
+        <g className="wave-ribbons wave-ribbons-a">
+          <path d="M-120 250 C80 120 210 350 390 245 S680 125 835 250 S1100 360 1270 235 S1510 150 1720 250" />
+          <path d="M-120 275 C70 355 240 145 415 260 S690 345 860 230 S1110 145 1295 260 S1530 345 1720 230" />
+        </g>
+        <g className="wave-ribbons wave-ribbons-b">
+          <path d="M-140 230 C80 355 235 160 420 245 S700 330 875 215 S1130 155 1310 245 S1510 335 1740 225" />
+          <path d="M-140 285 C80 155 220 340 405 255 S705 145 870 275 S1135 345 1320 235 S1550 150 1740 270" />
+        </g>
+      </svg>
+      <div className="wave-haze" />
+      <div className="wave-stars">
+        <i /><i /><i /><i /><i /><i /><i /><i />
+      </div>
+    </div>
+  )
+}
+
 export default function App() {
   const [state, setState] = useState({ on: true, brightness: 72, color: '#8b5cf6', scene: 'gaming', live: false, connected: false })
   const [loading, setLoading] = useState(true)
@@ -54,6 +99,7 @@ export default function App() {
 
   return (
     <main className="app-shell">
+      <EtherealWave />
       <div className="ambient ambient-one" />
       <div className="ambient ambient-two" />
 
@@ -128,7 +174,7 @@ export default function App() {
 
         <footer>
           <span>{state.connected ? <Wifi size={15} /> : <WifiOff size={15} />}{state.connected ? 'Controller online' : 'Development mode'}</span>
-          <span>Gaming Lights · v0.1</span>
+          <span>Gaming Lights · v0.2</span>
         </footer>
       </div>
     </main>
