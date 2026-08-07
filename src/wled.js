@@ -10,9 +10,11 @@ const mockState = {
   effectId: 0,
   effectSpeed: 128,
   effectIntensity: 128,
+  paletteId: 0,
 }
 
 const mockEffects = ['Solid', 'Aurora', 'Colorwaves', 'Pacifica', 'Fire 2012', 'Pride 2015', 'Flow', 'Rainbow', 'Twinklefox']
+const mockPalettes = ['Default', 'Party', 'Cloud', 'Lava', 'Ocean', 'Forest', 'Rainbow', 'Sunset', 'Aurora', 'Icefire', 'Retro Clown']
 const apiBase = import.meta.env.VITE_WLED_API_BASE?.replace(/\/$/, '')
 
 function hexToRgb(hex) {
@@ -38,6 +40,14 @@ export async function getEffects() {
   return request('/json/eff')
 }
 
+export async function getPalettes() {
+  if (!apiBase) {
+    await wait()
+    return [...mockPalettes]
+  }
+  return request('/json/pal')
+}
+
 export async function getLightState() {
   if (!apiBase) {
     await wait()
@@ -57,6 +67,7 @@ export async function getLightState() {
     effectId: segment.fx ?? 0,
     effectSpeed: segment.sx ?? 128,
     effectIntensity: segment.ix ?? 128,
+    paletteId: segment.pal ?? 0,
   }
 }
 
@@ -81,9 +92,34 @@ export async function updateLightState(patch) {
   return getLightState()
 }
 
-export async function setEffect({ effectId, speed = 128, intensity = 128 }) {
+export async function setEffect({ effectId, speed = 128, intensity = 128, paletteId }) {
   if (!apiBase) {
-    Object.assign(mockState, { effectId, effectSpeed: speed, effectIntensity: intensity, on: true })
+    Object.assign(mockState, {
+      effectId,
+      effectSpeed: speed,
+      effectIntensity: intensity,
+      ...(typeof paletteId === 'number' ? { paletteId } : {}),
+      on: true,
+    })
+    await wait(70)
+    return { ...mockState }
+  }
+
+  const segment = { fx: effectId, sx: speed, ix: intensity }
+  if (typeof paletteId === 'number') segment.pal = paletteId
+
+  await request('/json/state', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ on: true, seg: [segment] }),
+  })
+
+  return getLightState()
+}
+
+export async function setPalette(paletteId) {
+  if (!apiBase) {
+    Object.assign(mockState, { paletteId, on: true })
     await wait(70)
     return { ...mockState }
   }
@@ -91,7 +127,7 @@ export async function setEffect({ effectId, speed = 128, intensity = 128 }) {
   await request('/json/state', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ on: true, seg: [{ fx: effectId, sx: speed, ix: intensity }] }),
+    body: JSON.stringify({ on: true, seg: [{ pal: paletteId }] }),
   })
 
   return getLightState()
