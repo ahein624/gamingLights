@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import {
-  Gamepad2, MoonStar, Flame, Waves, Palette, MonitorUp, Power,
+  Gamepad2, MoonStar, Flame, Waves, Palette, Power,
   SlidersHorizontal, Wifi, WifiOff, Sparkles, Settings, Volume2,
   Image as ImageIcon, X, ShieldAlert,
 } from 'lucide-react'
 import { getLightState, updateLightState } from './wled.js'
 import UpdateManager from './UpdateManager.jsx'
+import OpenRgbControl from './OpenRgbControl.jsx'
 import './settings.css'
 
 const scenes = [
@@ -175,8 +176,6 @@ export default function App() {
           <div className={`light-orb ${state.on ? '' : 'off'}`} style={{ '--orb-color': state.color }}><div className="orb-core"><Gamepad2 size={34} /></div></div>
         </section>
 
-        {state.live && <section className="sync-banner"><div className="sync-icon"><MonitorUp size={22} /></div><div><strong>Game Sync active</strong><span>Controlled by the gaming PC</span></div><button onClick={() => update({ live: false })}>Stop</button></section>}
-
         <section className="section-block">
           <div className="section-heading"><div><p className="eyebrow">LIGHTING</p><h3>Pick a vibe</h3></div><SlidersHorizontal size={19} /></div>
           <div className="scene-grid">{scenes.map((scene) => { const Icon = scene.icon; const active = state.scene === scene.id && !state.live; return <button key={scene.id} className={`scene-card ${active ? 'selected' : ''}`} onClick={() => chooseScene(scene)}><span className="scene-icon" style={{ background: `linear-gradient(135deg, ${scene.colors[0]}, ${scene.colors[1]})` }}><Icon size={22} /></span><span className="scene-text"><strong>{scene.name}</strong><small>{scene.detail}</small></span>{active && <span className="selected-dot" />}</button> })}</div>
@@ -189,7 +188,7 @@ export default function App() {
           <div className="color-row">{quickColors.map((color) => <button key={color} aria-label={`Set color ${color}`} className={`color-swatch ${state.color === color ? 'chosen' : ''}`} style={{ background: color }} onClick={() => chooseColor(color)} />)}</div>
         </section>
 
-        <button className="sync-button" onClick={() => update({ live: !state.live, on: true })}><span className="sync-button-icon"><MonitorUp size={22} /></span><span><strong>{state.live ? 'Game Sync is running' : 'Start Game Sync'}</strong><small>React to what's happening on the PC</small></span><span className="arrow">›</span></button>
+        <OpenRgbControl onSyncChange={(live) => setState((current) => ({ ...current, live }))} />
 
         {settingsOpen && <section className="settings-panel">
           <div className="settings-header"><div><p className="eyebrow">SETTINGS</p><h3>Personalize the setup</h3></div><button className="settings-close" onClick={() => setSettingsOpen(false)} aria-label="Close settings"><X size={18} /></button></div>
@@ -213,7 +212,7 @@ export default function App() {
           <UpdateManager />
         </section>}
 
-        <footer><span>{state.connected ? <Wifi size={15} /> : <WifiOff size={15} />}{state.connected ? 'Controller online' : 'Development mode'}</span><button className="footer-settings" onClick={() => setSettingsOpen((open) => !open)}><Settings size={14} />Settings</button><span>Gaming Lights · v0.5</span></footer>
+        <footer><span>{state.connected ? <Wifi size={15} /> : <WifiOff size={15} />}{state.connected ? 'Controller online' : 'Development mode'}</span><button className="footer-settings" onClick={() => setSettingsOpen((open) => !open)}><Settings size={14} />Settings</button><span>Gaming Lights · v0.6</span></footer>
       </div>
     </main>
   )
