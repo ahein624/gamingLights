@@ -7,8 +7,12 @@ const mockState = {
   scene: 'gaming',
   live: false,
   connected: false,
+  effectId: 0,
+  effectSpeed: 128,
+  effectIntensity: 128,
 }
 
+const mockEffects = ['Solid', 'Aurora', 'Colorwaves', 'Pacifica', 'Fire 2012', 'Pride 2015', 'Flow', 'Rainbow', 'Twinklefox']
 const apiBase = import.meta.env.VITE_WLED_API_BASE?.replace(/\/$/, '')
 
 function hexToRgb(hex) {
@@ -26,6 +30,14 @@ async function request(path, options) {
   return response.json()
 }
 
+export async function getEffects() {
+  if (!apiBase) {
+    await wait()
+    return [...mockEffects]
+  }
+  return request('/json/eff')
+}
+
 export async function getLightState() {
   if (!apiBase) {
     await wait()
@@ -33,7 +45,8 @@ export async function getLightState() {
   }
 
   const state = await request('/json/state')
-  const color = state.seg?.[0]?.col?.[0] ?? [139, 92, 246]
+  const segment = state.seg?.[0] ?? {}
+  const color = segment.col?.[0] ?? [139, 92, 246]
   return {
     on: state.on,
     brightness: Math.round((state.bri / 255) * 100),
@@ -41,6 +54,9 @@ export async function getLightState() {
     scene: null,
     live: Boolean(state.live),
     connected: true,
+    effectId: segment.fx ?? 0,
+    effectSpeed: segment.sx ?? 128,
+    effectIntensity: segment.ix ?? 128,
   }
 }
 
@@ -60,6 +76,22 @@ export async function updateLightState(patch) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
+  })
+
+  return getLightState()
+}
+
+export async function setEffect({ effectId, speed = 128, intensity = 128 }) {
+  if (!apiBase) {
+    Object.assign(mockState, { effectId, effectSpeed: speed, effectIntensity: intensity, on: true })
+    await wait(70)
+    return { ...mockState }
+  }
+
+  await request('/json/state', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ on: true, seg: [{ fx: effectId, sx: speed, ix: intensity }] }),
   })
 
   return getLightState()
