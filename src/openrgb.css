@@ -1,0 +1,28 @@
+.openrgb-card { margin-top: 16px; padding: 16px; border: 1px solid #282831; border-radius: 20px; background: #131318da; backdrop-filter: blur(18px); }
+.openrgb-card.active { border-color: #4f3f79; background: linear-gradient(145deg, #17131fdf, #111117df); }
+.openrgb-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.openrgb-title-row { display: flex; align-items: center; gap: 13px; }
+.openrgb-title-row > div { display: flex; flex-direction: column; gap: 3px; }
+.openrgb-title-row strong { font-size: 13px; }
+.openrgb-title-row small { color: #777782; font-size: 10px; }
+.openrgb-refresh { width: 34px; height: 34px; border-radius: 10px; border: 1px solid #2b2b34; background: #ffffff08; color: #8b8b98; display: grid; place-items: center; cursor: pointer; }
+.openrgb-refresh:disabled { opacity: .45; cursor: default; }
+.openrgb-status-row { display: flex; align-items: center; gap: 8px; min-height: 32px; margin: 13px 0; padding: 0 3px; color: #858590; font-size: 10px; }
+.openrgb-status-row strong { margin-left: auto; color: #b9a5ff; text-transform: uppercase; letter-spacing: .08em; font-size: 9px; }
+.openrgb-status-dot { width: 7px; height: 7px; border-radius: 50%; background: #5e5e68; }
+.openrgb-status-dot.online { background: #34d399; box-shadow: 0 0 10px #34d39966; }
+.openrgb-modes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.openrgb-mode { min-width: 0; padding: 12px; border-radius: 14px; border: 1px solid #26262e; background: #0f0f14bd; color: #b1b1bb; display: flex; align-items: center; gap: 9px; text-align: left; cursor: pointer; transition: .18s ease; }
+.openrgb-mode:hover:not(:disabled) { border-color: #47414f; background: #16161d; }
+.openrgb-mode.selected { border-color: #6753a4; background: #211a32; color: #fff; }
+.openrgb-mode:disabled { opacity: .38; cursor: default; }
+.openrgb-mode span { display: flex; min-width: 0; flex-direction: column; gap: 2px; }
+.openrgb-mode strong { font-size: 11px; }
+.openrgb-mode small { color: #74747e; font-size: 9px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.openrgb-stop { margin-top: 10px; border: 1px solid #3c3035; border-radius: 11px; padding: 9px 12px; background: #2b171c; color: #f2b4c0; display: inline-flex; align-items: center; gap: 7px; cursor: pointer; font-size: 11px; }
+.openrgb-error { margin: 10px 0 0; color: #f59aa7; font-size: 10px; }
+.openrgb-help { margin: 10px 2px 0; color: #676772; font-size: 10px; line-height: 1.45; }
+@media (max-width: 560px) {
+  .openrgb-modes { grid-template-columns: 1fr; }
+  .openrgb-mode { min-height: 54px; }
+}
