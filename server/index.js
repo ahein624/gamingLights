@@ -79,7 +79,7 @@ app.post('/api/update/apply', async (req, res) => {
 })
 
 app.use(express.static(distDir))
-app.get('*', (_req, res) => res.sendFile(path.join(distDir, 'index.html')))
+app.use((_req, res) => res.sendFile(path.join(distDir, 'index.html')))
 
 app.listen(port, '0.0.0.0', () => {
   console.log(`Gaming Lights listening on http://0.0.0.0:${port}`)
