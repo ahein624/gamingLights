@@ -73,6 +73,11 @@ app.get('/api/wled/json/eff', async (_req, res) => {
   catch (error) { res.status(502).json({ error: 'Unable to read WLED effects', detail: error.message }) }
 })
 
+app.get('/api/wled/json/pal', async (_req, res) => {
+  try { res.json(await wledRequest('/json/pal')) }
+  catch (error) { res.status(502).json({ error: 'Unable to read WLED palettes', detail: error.message }) }
+})
+
 app.get('/api/openrgb/status', async (_req, res) => {
   try { res.json(await getOpenRgbStatus()) }
   catch (error) { res.status(500).json({ error: 'Unable to check OpenRGB', detail: error.message }) }
