@@ -5,6 +5,7 @@ import {
   Image as ImageIcon, X, ShieldAlert,
 } from 'lucide-react'
 import { getLightState, updateLightState } from './wled.js'
+import UpdateManager from './UpdateManager.jsx'
 import './settings.css'
 
 const scenes = [
@@ -72,7 +73,6 @@ export default function App() {
   useEffect(() => { stateRef.current = state }, [state])
   useEffect(() => { localStorage.setItem('gamingLightsPrefs', JSON.stringify(prefs)) }, [prefs])
   useEffect(() => () => stopListening(), [])
-
   useEffect(() => {
     getLightState().then(setState).catch(() => setError('Controller unavailable')).finally(() => setLoading(false))
   }, [])
@@ -112,7 +112,6 @@ export default function App() {
       const data = new Uint8Array(analyser.fftSize)
       audioRef.current = { stream, context, analyser, frame: null }
       setMicStatus('listening')
-
       const sample = () => {
         analyser.getByteTimeDomainData(data)
         let sum = 0
@@ -160,7 +159,6 @@ export default function App() {
       <div className="custom-background-image" />
       <EtherealWave />
       <div className="ambient ambient-one" /><div className="ambient ambient-two" />
-
       <div className="dashboard">
         <header className="topbar">
           <div><p className="eyebrow">GAMING LIGHTS</p><h1>Michael's setup</h1></div>
@@ -195,7 +193,6 @@ export default function App() {
 
         {settingsOpen && <section className="settings-panel">
           <div className="settings-header"><div><p className="eyebrow">SETTINGS</p><h3>Personalize the setup</h3></div><button className="settings-close" onClick={() => setSettingsOpen(false)} aria-label="Close settings"><X size={18} /></button></div>
-
           <div className="settings-group">
             <div className="settings-title"><ImageIcon size={18} /><div><strong>Background</strong><small>Change the room-control backdrop.</small></div></div>
             <div className="appearance-grid">
@@ -204,7 +201,6 @@ export default function App() {
             </div>
             {prefs.backgroundImage && <button className="text-button" onClick={() => setPrefs((c) => ({ ...c, backgroundImage: '' }))}>Remove background image</button>}
           </div>
-
           <div className="settings-group discreet-setting">
             <div className="settings-title"><ShieldAlert size={18} /><div><strong>Awareness alert</strong><small>A private volume cue using this device's microphone.</small></div></div>
             <label className="toggle-row"><span>Enable noise alert</span><input type="checkbox" checked={prefs.alertEnabled} onChange={(e) => setAlertEnabled(e.target.checked)} /></label>
@@ -214,9 +210,10 @@ export default function App() {
               <div className="mic-actions">{micStatus !== 'listening' ? <button onClick={startListening}><Volume2 size={16} />Start listening</button> : <button onClick={stopListening}>Stop listening</button>}<small>{micStatus === 'denied' ? 'Microphone permission was denied.' : micStatus === 'unsupported' ? 'Microphone access is unavailable here.' : micStatus === 'listening' ? 'Listening locally. Audio is not uploaded.' : 'Microphone remains off until started.'}</small></div>
             </>}
           </div>
+          <UpdateManager />
         </section>}
 
-        <footer><span>{state.connected ? <Wifi size={15} /> : <WifiOff size={15} />}{state.connected ? 'Controller online' : 'Development mode'}</span><button className="footer-settings" onClick={() => setSettingsOpen((open) => !open)}><Settings size={14} />Settings</button><span>Gaming Lights · v0.4</span></footer>
+        <footer><span>{state.connected ? <Wifi size={15} /> : <WifiOff size={15} />}{state.connected ? 'Controller online' : 'Development mode'}</span><button className="footer-settings" onClick={() => setSettingsOpen((open) => !open)}><Settings size={14} />Settings</button><span>Gaming Lights · v0.5</span></footer>
       </div>
     </main>
   )
