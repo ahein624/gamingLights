@@ -1,0 +1,17 @@
+.update-settings { border-top: 1px solid #ffffff0b; }
+.update-status { margin: 14px 0; padding: 12px 14px; border-radius: 14px; background: #ffffff08; border: 1px solid #ffffff0a; display: flex; flex-direction: column; gap: 3px; }
+.update-status span { font-size: 13px; font-weight: 650; }
+.update-status small, .update-message { color: #858592; font-size: 11px; }
+.update-key-field { display: flex; flex-direction: column; gap: 7px; margin: 12px 0; color: #9898a5; font-size: 11px; }
+.update-key-field input { width: 100%; border: 1px solid #303039; border-radius: 12px; padding: 10px 12px; background: #0c0c11; color: #f4f4f5; outline: none; }
+.update-key-field input:focus { border-color: #6d5aa4; box-shadow: 0 0 0 3px #7c3aed17; }
+.update-actions { display: flex; gap: 9px; flex-wrap: wrap; margin-top: 12px; }
+.update-actions button { border: 1px solid #303039; border-radius: 12px; background: #15151b; padding: 9px 12px; display: inline-flex; align-items: center; gap: 7px; cursor: pointer; font-size: 12px; }
+.update-actions button:hover:not(:disabled) { background: #1a1a22; border-color: #42424d; }
+.update-actions button:disabled { opacity: .45; cursor: default; }
+.update-actions .update-primary { background: #6d42db; border-color: #8059e5; color: white; }
+.update-actions .update-primary:hover:not(:disabled) { background: #7950e5; }
+.update-message { display: block; margin-top: 10px; }
+.spinning { animation: updateSpin .9s linear infinite; }
+@keyframes updateSpin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .spinning { animation: none; } }
