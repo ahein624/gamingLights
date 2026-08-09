@@ -1,0 +1,14 @@
+{
+  "name": "Gaming Lights",
+  "short_name": "Lights",
+  "description": "Michael's gaming-light controller",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#050509",
+  "theme_color": "#09090b",
+  "orientation": "portrait-primary",
+  "icons": [
+    { "src": "/app-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
