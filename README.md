@@ -2,14 +2,15 @@
 
 A mobile-first React control surface for a WLED-powered gaming setup.
 
-WLED remains the lighting engine; this app is the human-friendly frontend for power, brightness, colors, scenes, PC-reactive gaming modes, settings, and self-update.
+WLED remains the lighting engine; this app is the human-friendly frontend for power, brightness, colors, animations, presets, PC-reactive gaming modes, settings, and self-update.
 
 ## Architecture
 
 ```text
-Browser
+Browser / iOS Home Screen App
   -> Gaming Lights LXC (React + Express)
       -> WLED 192.168.68.166
+      -> Shared preset storage on the LXC
       -> OpenRGB on gaming PC
            -> E1.31 realtime stream -> WLED
 ```
@@ -33,6 +34,12 @@ npm run build
 npm start
 ```
 
+## iOS / PWA
+
+Gaming Lights includes a web app manifest, standalone iOS metadata, safe-area support, a service worker, and touch-oriented controls. On iPhone/iPad, open the site in Safari and use **Share -> Add to Home Screen**. The installed app opens without normal Safari chrome and respects the device safe areas.
+
+The service worker caches only the application shell. API/WLED/OpenRGB requests remain live and are never served from the offline cache.
+
 ## WLED
 
 Production defaults to:
@@ -41,27 +48,42 @@ Production defaults to:
 WLED_HOST=http://192.168.68.166
 ```
 
-The frontend talks to the same-origin `/api/wled` proxy rather than directly to the ESP32.
+The frontend talks to the same-origin `/api/wled` proxy rather than directly to the ESP32. The UI polls WLED so physical-button changes and web changes remain synchronized.
 
 ### Elite 4D physical button
 
-The temporary latching metal switch will be replaced with a **normally-open momentary illuminated pushbutton**. The button is a WLED control input, not a 24 V master power switch, so the Elite 4D remains powered and reachable from the web UI/OpenRGB when the LEDs are off.
-
-Planned switch wiring:
+The final hardware uses a **normally-open momentary illuminated pushbutton** as a WLED control input, not a 24 V master power switch. The Elite 4D therefore remains powered and reachable even when the LEDs are off.
 
 ```text
 Elite 4D IO13  -> momentary button NO contact
 Elite 4D GND   -> momentary button COM contact
 ```
 
-Do **not** connect 24 V to IO13. The illuminated ring is a separate circuit and must be wired according to the voltage rating of the replacement button.
+Do **not** connect 24 V to IO13. The illuminated ring is a separate circuit and must be wired according to the button's voltage rating.
 
-In WLED, configure GPIO 13 as the appropriate momentary pushbutton input. The web UI must treat WLED's reported `on` state as authoritative and periodically refresh it so a physical button press is reflected in the UI and web/OpenRGB changes remain synchronized.
+## Animations and presets
+
+The animation UI discovers the effects and palettes available on the installed WLED build instead of relying on fixed effect numbers. It includes curated effects, curated color moods, one-tap featured combinations, speed/intensity controls, and a random **Surprise Me** generator.
+
+The Preset Studio provides full fine tuning for:
+
+- Animation/effect
+- Palette
+- Speed
+- Intensity
+- Brightness
+- Base color
+- Preset name
+- Live preview
+
+Saved presets are stored on the Gaming Lights LXC at `data/user-presets.json` and are shared across phones, computers, and other clients. The file is ignored by Git, so self-updates do not overwrite user presets.
+
+Starter presets are created automatically on first use: Boss Fight, Late Night, Deep Space, and Hyperdrive.
 
 ## OpenRGB Game Sync
 
 1. Install OpenRGB on the gaming PC.
-2. Enable the OpenRGB SDK server. The default SDK port is `6742`.
+2. Enable the OpenRGB SDK server on port `6742`.
 3. Install the OpenRGB Effects Plugin and configure Ambilight/audio effects as desired.
 4. Configure an E1.31 device in OpenRGB that targets WLED at `192.168.68.166` and matches the strip's addressable zone count.
 5. Install/configure the OpenRGB HTTP Hook plugin and expose these actions on the LAN listener (default used by this app: port `6743`):
@@ -71,32 +93,29 @@ In WLED, configure GPIO 13 as the appropriate momentary pushbutton input. The we
    - `/gaming/audio`
 6. Reserve the gaming PC's IP address and set it as `OPENRGB_HOST` in the LXC environment.
 
-The backend exposes:
+## Software update key
 
-```text
-GET  /api/openrgb/status
-POST /api/openrgb/start   { "mode": "ambilight" | "audio" | "gaming" }
-POST /api/openrgb/stop
-```
+The server still validates updates against `UPDATE_KEY` from the LXC environment. The Settings UI can optionally remember the entered key in that browser's local storage so it does not need to be typed for every update. Use the remember option only on trusted devices. The key is never committed to the repository.
 
 ## Current scope
 
 - Responsive gaming-light dashboard
-- WLED power, brightness, and color controls
+- iOS/PWA home-screen support and safe-area layout
+- WLED state synchronization with physical GPIO13 button changes
+- WLED power, brightness, color, effects, palettes, speed, and intensity controls
+- Curated animation recipes and Surprise Me
+- Shared server-side Preset Studio
 - Color picker and curated scenes
 - Animated/customizable background
 - Noise-awareness settings
 - WLED server-side proxy
 - OpenRGB health and remote-effect API
-- Software update controls
+- Remembered update credential option
 - Proxmox/systemd deployment
-- Elite 4D external momentary-button plan on GPIO13
 
 ## Next
 
-- Connect the Game Sync UI to the new OpenRGB API
-- Synchronize the web UI with WLED's actual power state, including physical GPIO13 button changes
-- Detect WLED realtime/live state
-- Map UI scenes to WLED presets
+- Detect WLED realtime/live state more deeply while OpenRGB is streaming
 - Add multiple lighting zones
+- Add optional preset ordering/favorites
 - Move noise awareness to the ESP32 onboard microphone when the exact board/microphone interface is confirmed

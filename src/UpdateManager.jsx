@@ -1,12 +1,15 @@
 import { useState } from 'react'
-import { Download, RefreshCw } from 'lucide-react'
+import { Download, RefreshCw, KeyRound, Trash2 } from 'lucide-react'
 import './update-manager.css'
+
+const STORAGE_KEY = 'gamingLightsUpdateKey'
 
 export default function UpdateManager() {
   const [status, setStatus] = useState(null)
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState('')
-  const [updateKey, setUpdateKey] = useState('')
+  const [updateKey, setUpdateKey] = useState(() => localStorage.getItem(STORAGE_KEY) || '')
+  const [rememberKey, setRememberKey] = useState(() => Boolean(localStorage.getItem(STORAGE_KEY)))
 
   const check = async () => {
     setBusy(true)
@@ -23,16 +26,33 @@ export default function UpdateManager() {
     }
   }
 
+  const saveKeyPreference = (value, remember = rememberKey) => {
+    setUpdateKey(value)
+    if (remember) localStorage.setItem(STORAGE_KEY, value)
+    else localStorage.removeItem(STORAGE_KEY)
+  }
+
+  const toggleRemember = (checked) => {
+    setRememberKey(checked)
+    if (checked && updateKey) localStorage.setItem(STORAGE_KEY, updateKey)
+    else if (!checked) localStorage.removeItem(STORAGE_KEY)
+  }
+
+  const clearSavedKey = () => {
+    localStorage.removeItem(STORAGE_KEY)
+    setUpdateKey('')
+    setRememberKey(false)
+    setMessage('Saved update key removed from this device.')
+  }
+
   const apply = async () => {
     setBusy(true)
     setMessage('Installing update…')
     try {
+      if (rememberKey) localStorage.setItem(STORAGE_KEY, updateKey)
       const response = await fetch('/api/update/apply', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Update-Key': updateKey,
-        },
+        headers: { 'Content-Type': 'application/json', 'X-Update-Key': updateKey },
       })
       const data = await response.json()
       if (!response.ok) throw new Error(data.error || 'Update failed')
@@ -54,49 +74,22 @@ export default function UpdateManager() {
     <div className="settings-group update-settings">
       <div className="settings-title">
         <Download size={18} />
-        <div>
-          <strong>Software update</strong>
-          <small>Update this controller from the latest version on GitHub.</small>
-        </div>
+        <div><strong>Software update</strong><small>Update this controller from the latest version on GitHub.</small></div>
       </div>
 
-      {status && (
-        <div className="update-status">
-          <span>{status.updateAvailable ? 'Update available' : 'Up to date'}</span>
-          <small>
-            {status.updateAvailable
-              ? `${status.commitsBehind} change${status.commitsBehind === 1 ? '' : 's'} behind main`
-              : `Running ${status.current?.slice(0, 7)}`}
-          </small>
-        </div>
-      )}
+      {status && <div className="update-status"><span>{status.updateAvailable ? 'Update available' : 'Up to date'}</span><small>{status.updateAvailable ? `${status.commitsBehind} change${status.commitsBehind === 1 ? '' : 's'} behind main` : `Running ${status.current?.slice(0, 7)}`}</small></div>}
 
-      {status?.updateAvailable && (
-        <label className="update-key-field">
-          <span>Update key</span>
-          <input
-            type="password"
-            value={updateKey}
-            onChange={(event) => setUpdateKey(event.target.value)}
-            autoComplete="off"
-            placeholder="Enter update key"
-          />
-        </label>
-      )}
+      {(status?.updateAvailable || updateKey) && <div className="update-credential-block">
+        <label className="update-key-field"><span><KeyRound size={14} /> Update key</span><input type="password" value={updateKey} onChange={(event) => saveKeyPreference(event.target.value)} autoComplete="current-password" placeholder="Enter update key" /></label>
+        <label className="toggle-row"><span>Remember on this device</span><input type="checkbox" checked={rememberKey} onChange={(e) => toggleRemember(e.target.checked)} /></label>
+        {localStorage.getItem(STORAGE_KEY) && <button type="button" className="text-button" onClick={clearSavedKey}><Trash2 size={14} /> Forget saved key</button>}
+        <small className="update-message">Stored only in this browser on this device. Use this only on trusted devices.</small>
+      </div>}
 
       <div className="update-actions">
-        <button type="button" onClick={check} disabled={busy}>
-          <RefreshCw size={15} className={busy ? 'spinning' : ''} />
-          Check for updates
-        </button>
-        {status?.updateAvailable && (
-          <button type="button" className="update-primary" onClick={apply} disabled={busy || !updateKey}>
-            <Download size={15} />
-            Install update
-          </button>
-        )}
+        <button type="button" onClick={check} disabled={busy}><RefreshCw size={15} className={busy ? 'spinning' : ''} />Check for updates</button>
+        {status?.updateAvailable && <button type="button" className="update-primary" onClick={apply} disabled={busy || !updateKey}><Download size={15} />Install update</button>}
       </div>
-
       {message && <small className="update-message">{message}</small>}
     </div>
   )
