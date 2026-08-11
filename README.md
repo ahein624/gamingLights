@@ -9,7 +9,7 @@ WLED remains the lighting engine; this app is the human-friendly frontend for po
 ```text
 Browser / iOS Home Screen App
   -> Gaming Lights LXC (React + Express)
-      -> WLED 192.168.68.166
+      -> WLED 192.168.68.252
       -> Shared preset storage on the LXC
       -> OpenRGB on gaming PC
            -> E1.31 realtime stream -> WLED
@@ -45,7 +45,7 @@ The service worker caches only the application shell. API/WLED/OpenRGB requests 
 Production defaults to:
 
 ```text
-WLED_HOST=http://192.168.68.166
+WLED_HOST=http://192.168.68.252
 ```
 
 The frontend talks to the same-origin `/api/wled` proxy rather than directly to the ESP32. The UI polls WLED so physical-button changes and web changes remain synchronized.
@@ -85,7 +85,7 @@ Starter presets are created automatically on first use: Boss Fight, Late Night, 
 1. Install OpenRGB on the gaming PC.
 2. Enable the OpenRGB SDK server on port `6742`.
 3. Install the OpenRGB Effects Plugin and configure Ambilight/audio effects as desired.
-4. Configure an E1.31 device in OpenRGB that targets WLED at `192.168.68.166` and matches the strip's addressable zone count.
+4. Configure an E1.31 device in OpenRGB that targets WLED at `192.168.68.252` and matches the strip's addressable zone count.
 5. Install/configure the OpenRGB HTTP Hook plugin and expose these actions on the LAN listener (default used by this app: port `6743`):
    - `/gaming/start`
    - `/gaming/stop`
