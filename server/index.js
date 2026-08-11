@@ -15,7 +15,7 @@ const dataDir = path.join(rootDir, 'data')
 const presetsFile = path.join(dataDir, 'user-presets.json')
 const port = Number(process.env.PORT || 3000)
 const updateKey = process.env.UPDATE_KEY || ''
-const wledHost = (process.env.WLED_HOST || 'http://192.168.68.166').replace(/\/$/, '')
+const wledHost = (process.env.WLED_HOST || 'http://192.168.68.252').replace(/\/$/, '')
 const app = express()
 
 app.use(express.json({ limit: '1mb' }))
