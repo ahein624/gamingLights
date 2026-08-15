@@ -15,7 +15,7 @@ const mockState = {
 
 const mockEffects = ['Solid', 'Aurora', 'Colorwaves', 'Pacifica', 'Fire 2012', 'Pride 2015', 'Flow', 'Rainbow', 'Twinklefox']
 const mockPalettes = ['Default', 'Party', 'Cloud', 'Lava', 'Ocean', 'Forest', 'Rainbow', 'Sunset', 'Aurora', 'Icefire', 'Retro Clown']
-const apiBase = import.meta.env.VITE_WLED_API_BASE?.replace(/\/$/, '')
+const apiBase = (import.meta.env.VITE_WLED_API_BASE || '/api/wled').replace(/\/$/, '')
 
 function hexToRgb(hex) {
   const clean = hex.replace('#', '')
